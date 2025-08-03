@@ -23,7 +23,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Cliente Groq com LLaMA 3
+# Cliente Groq com LLaMA 3 hospedada no Render
 client = OpenAI(
     api_key=os.getenv("GROQ_API_KEY"),
     base_url="https://api.groq.com/openai/v1"
