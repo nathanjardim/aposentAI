@@ -51,9 +51,9 @@ def calcular_patrimonio_futuro(idade: int, idade_aposentadoria: int, aporte: flo
 # Geração de explicação com IA
 def gerar_explicacao_com_ia(idade: int, aporte: float, resultado: float, idade_aposentadoria: int) -> str:
     prompt = (
-        f"Explique de forma simples o seguinte cenário: uma pessoa com {idade} anos "
-        f"planeja investir R$ {aporte:,.2f} por mês até os {idade_aposentadoria} anos. "
-        f"O valor final simulado foi de R$ {resultado:,.2f}. Use linguagem acessível e objetiva."
+    f"Explique de forma objetiva e direta o seguinte cenário: uma pessoa com {idade} anos "
+    f"investe R$ {aporte:,.2f} por mês até os {idade_aposentadoria} anos. "
+    f"O valor final acumulado foi de R$ {resultado:,.2f}. Seja claro e breve, como em uma apresentação para leigos."
     )
 
     resposta = client.chat.completions.create(
@@ -91,3 +91,8 @@ def criar_simulacao(request: SimulacaoRequest, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(simulacao)
     return simulacao
+
+# Histórico de simulações
+@app.get("/simulacoes/")
+def listar_simulacoes(db: Session = Depends(get_db)):
+    return db.query(Simulacao).order_by(Simulacao.timestamp.desc()).all()

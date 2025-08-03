@@ -1,16 +1,23 @@
 import streamlit as st
 import requests
+import re
 
-API_URL = "https://aposentai-api.onrender.com"
+API_URL = "https://aposentai-api.onrender.com"  # sua URL da API FastAPI
 
 st.set_page_config(page_title="AposentAI", layout="centered")
 
 st.title("🧠 AposentAI — Simulador de Aposentadoria com IA")
 
+# Função para limpar a resposta da IA
+def clean_text(text):
+    return re.sub(r"[\u2028\u200b\u200e\u200f]+", "", text).replace("\n", " ").strip()
+
+# Inputs
 idade = st.number_input("Idade atual", min_value=18, max_value=100, value=30)
 idade_aposentadoria = st.number_input("Idade de aposentadoria", min_value=idade+1, max_value=100, value=65)
 aporte = st.number_input("Aporte mensal (R$)", min_value=0.0, step=100.0, value=1000.0)
 
+# Botão de simulação
 if st.button("Simular"):
     with st.spinner("Calculando com IA..."):
         try:
@@ -18,16 +25,40 @@ if st.button("Simular"):
                 "idade": idade,
                 "idade_aposentadoria": idade_aposentadoria,
                 "aporte": aporte,
-                "resultado": 0.0  # placeholder, será sobrescrito pela API
+                "resultado": 0.0  # será recalculado pela API
             })
 
             if response.status_code == 200:
                 data = response.json()
-                st.success(f"Resultado simulado: R$ {data['resultado']:.2f}")
-                st.write("Explicação gerada com IA:")
-                st.markdown(data["explicacao"])
+                st.success(f"🧾 Resultado simulado: **R$ {data['resultado']:,.2f}**")
+                st.markdown("📘 Explicação gerada com IA:")
+                st.markdown(clean_text(data["explicacao"]))
             else:
                 st.error(f"Erro: {response.status_code} — {response.text}")
 
+        except Exception as e:
+            st.error(f"Erro de conexão: {str(e)}")
+
+# Botão de histórico
+st.markdown("---")
+if st.button("📜 Ver histórico de simulações"):
+    with st.spinner("Carregando histórico..."):
+        try:
+            r = requests.get(f"{API_URL}/simulacoes/")
+            if r.status_code == 200:
+                historico = r.json()
+                if not historico:
+                    st.info("Nenhuma simulação encontrada.")
+                else:
+                    for s in historico:
+                        st.markdown(f"""
+                        🧾 **{s['timestamp'][:10]}**
+                        - Idade: {s['idade']}
+                        - Aporte: R$ {s['aporte']:.2f}
+                        - Resultado: R$ {s['resultado']:.2f}
+                        - **Explicação:** {clean_text(s['explicacao'])}
+                        """)
+            else:
+                st.error("Erro ao buscar histórico.")
         except Exception as e:
             st.error(f"Erro de conexão: {str(e)}")
