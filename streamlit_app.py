@@ -2,13 +2,13 @@ import streamlit as st
 import requests
 import re
 
-API_URL = "https://aposentai-api.onrender.com"  # sua URL da API FastAPI
+API_URL = "https://aposentai-api.onrender.com"
 
 st.set_page_config(page_title="AposentAI", layout="centered")
 
 st.title("🧠 AposentAI — Simulador de Aposentadoria com IA")
 
-# Função para limpar a resposta da IA
+# Limpar resposta da IA
 def clean_text(text):
     return re.sub(r"[\u2028\u200b\u200e\u200f]+", "", text).replace("\n", " ").strip()
 
