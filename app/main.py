@@ -3,13 +3,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from app.db import SessionLocal, engine
 from app.models import Base, Simulacao
+from app.schemas import SimulacaoRequest
 from openai import OpenAI
 import os
 
 Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
-# 👇 Liberar acesso do front (Streamlit Cloud)
 origins = [
     "https://aposentia.streamlit.app",
 ]
@@ -54,9 +54,14 @@ def read_root():
     return {"msg": "API do AposentAI funcionando"}
 
 @app.post("/simulacoes/")
-def criar_simulacao(idade: int, aporte: float, resultado: float, db: Session = Depends(get_db)):
-    explicacao = gerar_explicacao_com_ia(idade, aporte, resultado)
-    simulacao = Simulacao(idade=idade, aporte=aporte, resultado=resultado, explicacao=explicacao)
+def criar_simulacao(request: SimulacaoRequest, db: Session = Depends(get_db)):
+    explicacao = gerar_explicacao_com_ia(request.idade, request.aporte, request.resultado)
+    simulacao = Simulacao(
+        idade=request.idade,
+        aporte=request.aporte,
+        resultado=request.resultado,
+        explicacao=explicacao
+    )
     db.add(simulacao)
     db.commit()
     db.refresh(simulacao)
