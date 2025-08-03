@@ -43,3 +43,7 @@ def criar_simulacao(idade: int, aporte: float, resultado: float, db: Session = D
     db.commit()
     db.refresh(simulacao)
     return simulacao
+
+@app.get("/")
+def read_root():
+    return {"msg": "API do AposentAI funcionando"}
