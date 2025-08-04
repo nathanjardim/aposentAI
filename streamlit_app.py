@@ -7,13 +7,13 @@ API_URL = "https://aposentai-api.onrender.com"
 
 st.set_page_config(page_title="AposentAI", layout="centered")
 
-def clean_text(text):
-    text = re.sub(r"[\u2028\u200b\u200e\u200f\u00ad]+", "", text)
-    text = re.sub(r"R\s?([\d,.]+)", r"R$ \1", text)
-    text = unicodedata.normalize("NFKC", text)
-    return text.replace("\n", " ").strip()
-
 st.title("🧠 AposentAI — Simulador de Aposentadoria com IA")
+
+def clean_text(text):
+    text = unicodedata.normalize("NFKC", text)
+    text = re.sub(r"[\u2028\u200b\u200e\u200f\u00ad*_`]+", "", text)
+    text = re.sub(r"R\s?([\d,.]+)", r"R$ \1", text)
+    return text.replace("\n", " ").strip()
 
 idade = st.number_input("Idade atual", min_value=18, max_value=100, value=30)
 idade_aposentadoria = st.number_input("Idade de aposentadoria", min_value=idade+1, max_value=100, value=65)
@@ -31,9 +31,9 @@ if st.button("Simular"):
 
             if response.status_code == 200:
                 data = response.json()
-                st.success(f"Resultado simulado: R$ {data['resultado']:.2f}")
+                st.success(f"Resultado simulado: R$ {int(data['resultado']):,}".replace(",", "."))
                 st.write("Explicação gerada com IA:")
-                st.markdown(clean_text(data["explicacao"]))
+                st.write(clean_text(data["explicacao"]))
             else:
                 st.error(f"Erro: {response.status_code} — {response.text}")
 
@@ -41,6 +41,7 @@ if st.button("Simular"):
             st.error(f"Erro de conexão: {str(e)}")
 
 st.markdown("---")
+
 if st.button("📜 Ver histórico de simulações"):
     with st.spinner("Carregando histórico..."):
         try:
@@ -54,9 +55,9 @@ if st.button("📜 Ver histórico de simulações"):
                         st.markdown(f"""
                         🧾 **{s['timestamp'][:10]}**
                         - Idade: {s['idade']}
-                        - Aporte: R$ {s['aporte']:.2f}
-                        - Resultado: R$ {s['resultado']:.2f}
-                        - **Explicação:** {clean_text(s['explicacao'])}
+                        - Aporte: R$ {int(s['aporte']):,}".replace(",", ".") + f"
+                        - Resultado: R$ {int(s['resultado']):,}".replace(",", ".") + f"
+                        - Explicação: {clean_text(s['explicacao'])}
                         """)
             else:
                 st.error("Erro ao buscar histórico.")

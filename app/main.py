@@ -51,12 +51,13 @@ def calcular_patrimonio_futuro(idade: int, idade_aposentadoria: int, aporte: flo
 # Geração da explicação com IA
 def gerar_explicacao_com_ia(idade: int, aporte: float, resultado: float, idade_aposentadoria: int) -> str:
     prompt = (
-    f"Você contribuiu mensalmente com R$ {aporte:,.2f} dos {idade} até os {idade_aposentadoria} anos, "
-    f"e acumulou R$ {resultado:,.2f} ao final. Explique esse resultado como se estivesse respondendo "
+    f"Você contribuiu mensalmente com R$ {int(aporte):,} dos {idade} até os {idade_aposentadoria} anos, "
+    f"e acumulou R$ {int(resultado):,} ao final. Explique esse resultado como se estivesse respondendo "
     f"em uma entrevista de emprego. Seja claro, conciso, em até 5 linhas. "
     f"Não repita a pergunta nem os parâmetros. Não use negrito, itálico ou saudações. "
     f"Apenas o texto direto, em segunda pessoa, como se estivesse explicando sua própria decisão."
 )
+
 
     resposta = client.chat.completions.create(
         model="llama3-70b-8192",
