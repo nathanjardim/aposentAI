@@ -10,14 +10,16 @@ st.set_page_config(page_title="AposentAI", layout="centered")
 st.title("🧠 AposentAI — Simulador de Aposentadoria com IA")
 
 def clean_text(text):
-    text = unicodedata.normalize("NFKC", text)
-    text = re.sub(r"[\u2028\u200b\u200e\u200f\u00ad*_`]+", "", text)
+    text = unicodedata.normalize("NFKD", text)
+    text = ''.join(c for c in text if ord(c) < 128)
     text = re.sub(r"R\s?([\d,.]+)", r"R$ \1", text)
-    return text.replace("\n", " ").strip()
+    text = text.replace("\n", " ")
+    text = re.sub(r"\s{2,}", " ", text)
+    return text.strip()
 
 idade = st.number_input("Idade atual", min_value=18, max_value=100, value=30)
 idade_aposentadoria = st.number_input("Idade de aposentadoria", min_value=idade+1, max_value=100, value=65)
-aporte = st.number_input("Aporte mensal (R$)", min_value=0.0, step=100.0, value=1000.0)
+aporte = st.number_input("Aporte mensal (R$)", min_value=0, step=100, value=1000, format="%d")
 
 if st.button("Simular"):
     with st.spinner("Calculando com IA..."):
@@ -26,7 +28,7 @@ if st.button("Simular"):
                 "idade": idade,
                 "idade_aposentadoria": idade_aposentadoria,
                 "aporte": aporte,
-                "resultado": 0.0
+                "resultado": 0
             })
 
             if response.status_code == 200:
