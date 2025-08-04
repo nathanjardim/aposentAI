@@ -1,6 +1,8 @@
 # 🧠 AposentAI
 
-**AposentAI** é um simulador de aposentadoria inteligente que combina cálculo financeiro real com explicações geradas por inteligência artificial. O projeto foi desenvolvido como portfólio técnico para uma vaga de Desenvolvedor Backend com Foco em IA Aplicada.
+> ⚠️ *Este projeto utiliza servidores gratuitos que entram em modo de hibernação após um período de inatividade. Ao acessar, pode haver uma pequena demora inicial de carregamento (15–30 segundos) até que tudo fique ativo novamente.*
+
+**AposentAI** é um simulador de aposentadoria inteligente que combina cálculo financeiro real com explicações geradas por inteligência artificial (LLaMA 3, via Groq API). O projeto foi desenvolvido como portfólio para uma vaga de Desenvolvedor Backend com Foco em IA Aplicada.
 
 ---
 
@@ -103,11 +105,5 @@ GROQ_API_KEY=sk-xxxxxx
 | Deploy API   | Render.com                            |
 | Deploy Front | Streamlit Cloud                       |
 | Container    | Docker (imagem leve Python 3.11)      |
-
----
-
-## 👨‍💻 Autor
-
-Desenvolvido por Nathan Jardim.
 
 ---
