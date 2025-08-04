@@ -10,7 +10,7 @@ import os
 Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
-# Liberar acesso do Streamlit Cloud
+# Liberar acesso do frontend Streamlit
 origins = [
     "https://aposentia.streamlit.app",
 ]
@@ -23,13 +23,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Cliente Groq com LLaMA 3 hospedada no Render
+# Conectar à API da Groq
 client = OpenAI(
     api_key=os.getenv("GROQ_API_KEY"),
     base_url="https://api.groq.com/openai/v1"
 )
 
-# Conexão com DB
+# Conexão com o banco
 def get_db():
     db = SessionLocal()
     try:
@@ -37,7 +37,7 @@ def get_db():
     finally:
         db.close()
 
-# Cálculo real de patrimônio com juros compostos
+# Cálculo de patrimônio futuro com juros compostos
 def calcular_patrimonio_futuro(idade: int, idade_aposentadoria: int, aporte: float) -> float:
     meses = (idade_aposentadoria - idade) * 12
     taxa_mensal = 0.006
@@ -48,38 +48,32 @@ def calcular_patrimonio_futuro(idade: int, idade_aposentadoria: int, aporte: flo
     montante = aporte * (((1 + taxa_mensal) ** meses - 1) / taxa_mensal)
     return round(montante, 2)
 
-# Geração de explicação com IA
+# Geração da explicação com IA
 def gerar_explicacao_com_ia(idade: int, aporte: float, resultado: float, idade_aposentadoria: int) -> str:
     prompt = (
-    f"Explique de forma objetiva e direta o seguinte cenário: uma pessoa com {idade} anos "
-    f"investe R$ {aporte:,.2f} por mês até os {idade_aposentadoria} anos. "
-    f"O valor final acumulado foi de R$ {resultado:,.2f}. Seja claro e breve, como em uma apresentação para leigos."
+        f"Explique de forma direta o seguinte caso: uma pessoa de {idade} anos contribui com "
+        f"R$ {aporte:,.2f} por mês até os {idade_aposentadoria} anos. No final, o montante acumulado foi "
+        f"de R$ {resultado:,.2f}. Responda como se estivesse explicando em uma entrevista de emprego, de forma clara, concisa e em no máximo 5 linhas."
     )
 
     resposta = client.chat.completions.create(
         model="llama3-70b-8192",
         messages=[{"role": "user", "content": prompt}],
-        temperature=0.7
+        temperature=0.5
     )
 
     return resposta.choices[0].message.content.strip()
 
-# Teste básico
+# Teste da API
 @app.get("/")
 def read_root():
     return {"msg": "API do AposentAI funcionando"}
 
-# Endpoint principal
+# Criar nova simulação
 @app.post("/simulacoes/")
 def criar_simulacao(request: SimulacaoRequest, db: Session = Depends(get_db)):
     resultado = calcular_patrimonio_futuro(request.idade, request.idade_aposentadoria, request.aporte)
-
-    explicacao = gerar_explicacao_com_ia(
-        idade=request.idade,
-        aporte=request.aporte,
-        resultado=resultado,
-        idade_aposentadoria=request.idade_aposentadoria
-    )
+    explicacao = gerar_explicacao_com_ia(request.idade, request.aporte, resultado, request.idade_aposentadoria)
 
     simulacao = Simulacao(
         idade=request.idade,
@@ -92,7 +86,7 @@ def criar_simulacao(request: SimulacaoRequest, db: Session = Depends(get_db)):
     db.refresh(simulacao)
     return simulacao
 
-# Histórico de simulações
+# Listar todas as simulações
 @app.get("/simulacoes/")
 def listar_simulacoes(db: Session = Depends(get_db)):
     return db.query(Simulacao).order_by(Simulacao.timestamp.desc()).all()
