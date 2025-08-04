@@ -35,7 +35,7 @@ if st.button("Simular"):
                 data = response.json()
                 st.success(f"Resultado simulado: R$ {int(data['resultado']):,}".replace(",", "."))
                 st.write("Explicação gerada com IA:")
-                st.write(clean_text(data["explicacao"]))
+                st.text(clean_text(data["explicacao"]))
             else:
                 st.error(f"Erro: {response.status_code} — {response.text}")
 
