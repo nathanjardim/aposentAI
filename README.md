@@ -36,7 +36,6 @@
 ## 🔗 Acesso ao app
 
 - **Frontend (Streamlit):** https://aposentia.streamlit.app  
-- **Backend (FastAPI):** https://aposentai-api.onrender.com  
 
 ---
 
