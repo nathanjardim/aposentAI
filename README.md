@@ -38,13 +38,6 @@
 
 ---
 
-## 📷 Preview
-
-> <img width="983" height="851" alt="image" src="https://github.com/user-attachments/assets/f57de5c1-6909-4787-a57e-a2863bfa1a80" />
-*
-
----
-
 ## 📂 Estrutura do projeto
 
 ```
