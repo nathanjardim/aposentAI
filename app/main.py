@@ -53,7 +53,7 @@ def gerar_explicacao_com_ia(idade: int, aporte: float, resultado: float, idade_a
     prompt = (
         f"Explique de forma direta o seguinte caso: uma pessoa de {idade} anos contribui com "
         f"R$ {aporte:,.2f} por mês até os {idade_aposentadoria} anos. No final, o montante acumulado foi "
-        f"de R$ {resultado:,.2f}. Responda como se estivesse explicando em uma entrevista de emprego, de forma clara, concisa e em no máximo 5 linhas."
+        f"de R$ {resultado:,.2f}. Responda como se estivesse explicando em uma entrevista de emprego, de forma clara, concisa e em no máximo 5 linhas. Não repita a pergunta, não repita os parâmetros, nem fale ok, olá, sim senhor ou algo do tipo. Apenas a resposta direta. E nem coloque nada em negrito, apenas o texto simples corrido."
     )
 
     resposta = client.chat.completions.create(
